@@ -1,33 +1,41 @@
-# CIFAR-10 Image Classifier — PyTorch CNN
+# CIFAR-10 Image Classification — PyTorch CNN & ResNet-18 Fine-tuning
 
-A convolutional neural network built from scratch in PyTorch, trained on the CIFAR-10 dataset.
+Two approaches to image classification on CIFAR-10, built in PyTorch on Apple M1 (MPS backend).
 
-## Result
-**72.5% test accuracy** on 10,000 unseen images across 10 classes.
+## Results
 
-## Architecture
-- Conv2d (3→32 filters) + ReLU + MaxPool
-- Conv2d (32→64 filters) + ReLU + MaxPool
-- Fully connected: 4096 → 512 → 128 → 10
-- Trained with Adam optimizer, CrossEntropyLoss, 10 epochs
+| Model | Approach | Test Accuracy |
+|-------|----------|---------------|
+| Custom CNN | Trained from scratch | 72.5% |
+| ResNet-18 | Full fine-tuning (transfer learning) | 84.05% |
 
-## Dataset
-CIFAR-10 — 60,000 images across 10 classes: airplane, car, bird, cat, deer, dog, frog, horse, ship, truck.
-- 50,000 training images
-- 10,000 test images
+Transfer learning improved accuracy by **+11.55%** over training from scratch.
 
-## Training Environment
-- PyTorch 2.11 on Apple M1 (MPS backend)
-- Batch size: 64
-- Learning rate: 0.001
-- Epochs: 10 — loss reduced from 1.35 → 0.08
+## Models
+
+### Custom CNN (`cifar_cnn.py`)
+- 2 Conv2d layers + MaxPool + 3 fully connected layers
+- Trained with Adam, CrossEntropyLoss, 10 epochs
+- Loss: 1.35 → 0.08
+
+### ResNet-18 Fine-tuned (`resnet_finetune.py`)
+- Pretrained on ImageNet, fully fine-tuned on CIFAR-10
+- Differential learning rates: 1e-4 (backbone) / 1e-3 (classifier head)
+- Data augmentation: RandomHorizontalFlip, RandomCrop
+- LR scheduler: StepLR (decay ×0.5 every 3 epochs)
+- Loss: 1.15 → 0.39
+
+## Key concepts demonstrated
+- CNN architecture design from scratch
+- Transfer learning and full fine-tuning
+- Differential learning rates for pretrained models
+- Data augmentation for generalisation
+- LR scheduling
+- Apple M1 MPS backend for GPU-accelerated training
 
 ## How to run
 ```bash
 pip install torch torchvision
-python3 cifar_cnn.py
+python3 cifar_cnn.py        # train/evaluate scratch CNN
+python3 resnet_finetune.py  # evaluate fine-tuned ResNet (set TRAIN=True to retrain)
 ```
-
-## Files
-- `cifar_cnn.py` — model definition, training loop, evaluation
-- `day1.py` — PyTorch fundamentals (tensors, autograd, MPS)
