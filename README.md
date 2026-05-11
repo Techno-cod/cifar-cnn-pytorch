@@ -1,6 +1,6 @@
-# CIFAR-10 Image Classification — PyTorch CNN & ResNet-18 Fine-tuning
+# CIFAR-10 Image Classification — PyTorch CNN, ResNet-18 & CLIP
 
-Two approaches to image classification on CIFAR-10, built in PyTorch on Apple M1 (MPS backend).
+Three approaches to image classification on CIFAR-10, built in PyTorch on Apple M1 (MPS backend).
 
 ## Results
 
@@ -8,8 +8,12 @@ Two approaches to image classification on CIFAR-10, built in PyTorch on Apple M1
 |-------|----------|---------------|
 | Custom CNN | Trained from scratch | 72.5% |
 | ResNet-18 | Full fine-tuning (transfer learning) | 84.05% |
+| CLIP ViT-B/32 | Zero-shot (no training) | 85.70% |
 
-Transfer learning improved accuracy by **+11.55%** over training from scratch.
+CLIP achieves 85.70% with **zero task-specific training** — outperforming the fine-tuned ResNet by +1.65%.
+
+## Key insight
+CLIP encodes images and text into the same 512-dimensional vector space during pretraining. At inference, it finds the text label most similar to the image — no gradient updates, no CIFAR-10 examples ever seen.
 
 ## Models
 
@@ -20,22 +24,21 @@ Transfer learning improved accuracy by **+11.55%** over training from scratch.
 
 ### ResNet-18 Fine-tuned (`resnet_finetune.py`)
 - Pretrained on ImageNet, fully fine-tuned on CIFAR-10
-- Differential learning rates: 1e-4 (backbone) / 1e-3 (classifier head)
+- Differential learning rates: 1e-4 (backbone) / 1e-3 (head)
 - Data augmentation: RandomHorizontalFlip, RandomCrop
 - LR scheduler: StepLR (decay ×0.5 every 3 epochs)
-- Loss: 1.15 → 0.39
 
-## Key concepts demonstrated
-- CNN architecture design from scratch
-- Transfer learning and full fine-tuning
-- Differential learning rates for pretrained models
-- Data augmentation for generalisation
-- LR scheduling
-- Apple M1 MPS backend for GPU-accelerated training
+### CLIP Zero-Shot (`clip_demo.py`)
+- Model: ViT-B/32 (Vision Transformer)
+- No training — classifies using natural language prompts
+- Example prompt: "a photo of a cat"
+- Tested on 1,000 CIFAR-10 test images
 
 ## How to run
 ```bash
 pip install torch torchvision
-python3 cifar_cnn.py        # train/evaluate scratch CNN
-python3 resnet_finetune.py  # evaluate fine-tuned ResNet (set TRAIN=True to retrain)
+pip install git+https://github.com/openai/CLIP.git
+python3 cifar_cnn.py        # scratch CNN
+python3 resnet_finetune.py  # fine-tuned ResNet
+python3 clip_demo.py        # CLIP zero-shot
 ```
