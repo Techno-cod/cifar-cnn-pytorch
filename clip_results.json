@@ -1,0 +1,12 @@
+{
+  "task": "CIFAR-10 image classification",
+  "models": {
+    "random_baseline": 10.0,
+    "scratch_cnn": 72.5,
+    "resnet18_finetuned": 84.05,
+    "clip_zero_shot": 85.7
+  },
+  "clip_model": "ViT-B/32",
+  "images_tested": 1000,
+  "note": "CLIP achieves this with zero task-specific training"
+}
